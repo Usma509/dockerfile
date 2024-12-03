@@ -16,9 +16,14 @@ pipeline {
         stage('Docker Build Image') {
             steps {
                 script {
-                    // Check if docker is available
                     if (isUnix()) {
-                        dockerImage = docker.build("${registry}:latest")  // Build the Docker image with the 'latest' tag
+                        // Ensure Docker is available and then build the Docker image
+                        try {
+                            dockerImage = docker.build("${registry}:latest")  // Build the Docker image with the 'latest' tag
+                        } catch (Exception e) {
+                            echo "Docker build failed: ${e.getMessage()}"
+                            currentBuild.result = 'FAILURE'
+                        }
                     } else {
                         echo "Docker not available on this machine"
                     }
@@ -27,3 +32,4 @@ pipeline {
         }
     }
 }
+
