@@ -1,27 +1,27 @@
 pipeline {
     agent any
-    
+
     environment {
-        // Set the environment variables
-        dockerImage = ''  // Define the image variable (you can leave it empty for now)
-        registry = 'usma001/pythonapp'  // The name of your Docker registry and image
+        dockerImage = ''  // Define the image variable
+        registry = 'usma001/pythonapp'  // Your Docker registry and image name
     }
-    
+
     stages {
         stage('Checkout') {
             steps {
-                script {
-                    // Manually clone the repository using Git
-                    git url: 'https://github.com/Usma509/dockerfile.git', branch: 'main'
-                }
+                git url: 'https://github.com/Usma509/dockerfile.git', branch: 'main'
             }
         }
-        
+
         stage('Docker Build Image') {
             steps {
                 script {
-                    // Build the Docker image using the Dockerfile in the repository
-                    dockerImage = docker.build("${registry}:latest")  // Build the Docker image with the 'latest' tag
+                    // Check if docker is available
+                    if (isUnix()) {
+                        dockerImage = docker.build("${registry}:latest")  // Build the Docker image with the 'latest' tag
+                    } else {
+                        echo "Docker not available on this machine"
+                    }
                 }
             }
         }
